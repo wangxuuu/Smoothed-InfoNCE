@@ -66,7 +66,7 @@ class MINE(nn.Module):
         #                             nn.Linear(hidden_size, 1))
         self.F_func = Net(x_dim + y_dim, hidden_size, sigma=0.02)
 
-    def step(self, x_samples, y_samples):
+    def step(self, x_samples, y_samples, reg=False):
         sample_size = y_samples.shape[0]
         random_index = torch.randint(sample_size, (sample_size,)).long()
 
@@ -75,10 +75,14 @@ class MINE(nn.Module):
         T0 = self.F_func(torch.cat([x_samples, y_samples], dim=-1))
         T1 = self.F_func(torch.cat([x_samples, y_shuffle], dim=-1))
         L = torch.logsumexp(T1, dim=0) - np.log(sample_size)
-        loss =  - T0.mean() + L + L**2
+        if reg:
+            loss =  - T0.mean() + L + L**2
+        else:
+            loss = - T0.mean() + L
+
         return loss
 
-    def mi_est(self, x_samples, y_samples):  # samples have shape [sample_size, dim]
+    def mi_est(self, x_samples, y_samples, writer=None, epoch=None):  # samples have shape [sample_size, dim]
         # shuffle and concatenate
         sample_size = y_samples.shape[0]
         random_index = torch.randint(sample_size, (sample_size,)).long()
@@ -88,7 +92,15 @@ class MINE(nn.Module):
         T0 = self.F_func(torch.cat([x_samples, y_samples], dim=-1))
         T1 = self.F_func(torch.cat([x_samples, y_shuffle], dim=-1))
 
-        lower_bound = T0.mean() - torch.logsumexp(T1, dim=0) + np.log(sample_size)
+        a = T0.mean()
+        b = torch.logsumexp(T1, dim=0) - np.log(sample_size)
+
+        if writer is not None:
+            writer.add_scalar('MINE/a', a, epoch)
+            writer.add_scalar('MINE/b', b, epoch)
+
+        return a - b
+        lower_bound = a-b
 
         # compute the negative loss (maximise loss == minimise -loss)
         return lower_bound
