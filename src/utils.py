@@ -15,6 +15,12 @@ def setup_seed(seed):
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.enabled = True
 
+def resample(data, batch_size, replace=False):
+    # Resample the given data sample.
+    index = np.random.choice(
+        range(data.shape[0]), size=batch_size, replace=replace)
+    batch = data[index]
+    return batch
 
 def plot_subfigure(net, X, Y, dimX, dimY, x0=None, y0=None, xmin=-5, xmax=5, ymin=-5, ymax=5, xgrids=50, ygrids=50, ax=None, show_details=True):
     """

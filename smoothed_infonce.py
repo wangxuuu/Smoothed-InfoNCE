@@ -153,7 +153,7 @@ def smooth_loss(net, prob_matrix, x_data, y_data, alpha, writer=None, epoch=None
     a = (net(joint_samples)*pos_prob_DT).mean() + (net(marginal_samples)*neg_prob_DT).mean()
 
     # second term:
-    # E[log (E[e^f(X,Y')*p(C=0|X,Y')*P(C=0)|X] + E[e^f(X,Y)*p(C=0|X,Y)*p(C=1)|X]) - log p(C=0|X) ] 
+    # E[log (E[e^f(X,Y')*p(C=0|X,Y')*P(C=0)|X] + E[e^f(X,Y)*p(C=0|X,Y)*p(C=1)|X]) - log p(C=0|X) ]
 
     # b_list contains log (E[e^f(X,Y')*p(C=0|X,Y')*P(C=0)|X] + E[e^f(X,Y)*p(C=0|X,Y)*p(C=1)|X]) - log p(C=0|X) for each x
     b_list = []
@@ -203,12 +203,12 @@ if continue_train:
             prob_batch = DT_prob_matrix[np.ix_(batch_idx, batch_idx)]
 
             optimizer_D.zero_grad()
-            loss = - smooth_loss(discriminator, prob_batch, batch_X, batch_Y, alpha=0.2, reg=opt.reg) # negative infonce_bound as the loss
+            loss = - smooth_loss(discriminator, prob_batch, batch_X, batch_Y, alpha=opt.alpha, reg=opt.reg) # negative infonce_bound as the loss
             loss.backward()
 
             optimizer_D.step()
         with torch.no_grad():
-            mi_est = smooth_loss(discriminator, DT_prob_matrix, X, Y, alpha=0.2)
+            mi_est = smooth_loss(discriminator, DT_prob_matrix, X, Y, alpha=opt.alpha)
         mi_list.append(mi_est.item())
 
         writer.add_scalar('mi_list', mi_est.item(), _iter)
@@ -216,7 +216,7 @@ if continue_train:
         _iter += 1
         if _iter%200==0:
             print("Iternation: %d, loss: %f, mi_est: %f"%(_iter, loss.item(), mi_est))
-            fig = plot_fig(discriminator, X, Y, opt.d)
+            fig = plot_fig(discriminator, X, Y, opt.d if opt.d<6 else 6)
             writer.add_figure('heatmap', fig, _iter)
             writer.add_histogram('first layer', discriminator.fc[0].weight.data, _iter)
             writer.add_histogram('second layer', discriminator.fc[1].weight.data, _iter)
