@@ -46,8 +46,8 @@ opt.n_iters = opt.n_epoch * opt.n_iters_1epoch
 ma_rate = 0.01  # moving average rate
 
 continue_train = True  # set to True to continue to train
-load_available = False # set to False to prevent loading previous results
-overwrite = False  # set to True to overwrite previously stored results
+load_available = True # set to False to prevent loading previous results
+overwrite = True  # set to True to overwrite previously stored results
 
 
 data = GaussianData(opt.sample_size, d=opt.d, rho=opt.rho)
@@ -177,7 +177,7 @@ def smooth_loss(net, prob_matrix, x_data, y_data, alpha, writer=None, epoch=None
 
 # continue_train = False  # set to True to continue to train
 if continue_train:
-    _iter = 0
+    _iter = len(mi_list)
     for i in range(opt.n_epoch):
         idx = np.random.permutation(opt.sample_size)
         for j in range(opt.n_iters_1epoch):
