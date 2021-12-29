@@ -426,7 +426,6 @@ class Prob_Net(nn.Module):
         output = input
         for i in range(self.hidden_layers):
             output = F.elu(self.fc[i](output))
-        output = self.fc[self.hidden_layers](output)
         output = torch.sigmoid(self.fc[self.hidden_layers](output))
         return output
 
