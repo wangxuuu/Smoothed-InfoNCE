@@ -199,7 +199,7 @@ if continue_train:
         _iter += 1
         if _iter%200==0:
             print("Iternation: %d, loss: %f, mi_est: %f"%(_iter, loss.item(), mi_est))
-            fig = plot_fig(discriminator, X, Y, opt.d)
+            fig = plot_fig(discriminator, X, Y, opt.d if opt.d<6 else 6)
             writer.add_figure('heatmap', fig, _iter)
             writer.add_histogram('first layer', discriminator.fc[0].weight.data, _iter)
             writer.add_histogram('second layer', discriminator.fc[1].weight.data, _iter)
