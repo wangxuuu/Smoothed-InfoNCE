@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Smoothed-InfoNCE</title>
+    <title>Smoothed InfoNCE: Breaking the log N Curse without Overshooting</title>
     
   <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -87,6 +87,8 @@ commentsRunWhenDOMLoaded(addUtterances);
         const thebe_selector_output = ".output,.cell_output"
     </script>
     <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Estimating MI by noise contrastive method (InfoNCE)" href="infonce.html" />
@@ -118,7 +120,7 @@ commentsRunWhenDOMLoaded(addUtterances);
     <ul class="nav sidenav_l1">
  <li class="toctree-l1 current active">
   <a class="reference internal" href="#">
-   Smoothed-InfoNCE
+   Smoothed InfoNCE: Breaking the log N Curse without Overshooting
   </a>
  </li>
 </ul>
@@ -130,12 +132,17 @@ commentsRunWhenDOMLoaded(addUtterances);
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="smoothed_infoNCE.html">
-   Apply label smoothing to infoNCE
+   Smoothed InfoNCE
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="smoothed_infoNCE.html#train-decision-tree">
-   Train Decision Tree
+  <a class="reference internal" href="smoothed_infoNCE.html#setup">
+   Setup
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="smoothed_infoNCE.html#initialize-the-model">
+   Initialize the model.
   </a>
  </li>
 </ul>
@@ -203,6 +210,25 @@ commentsRunWhenDOMLoaded(addUtterances);
     <!-- Table of contents -->
     <div class="d-none d-md-block col-md-2 bd-toc show">
         
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i> Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#background">
+   Background
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#proposed-model-smoothed-infonce">
+   Proposed Model: Smoothed InfoNCE
+  </a>
+ </li>
+</ul>
+
+        </nav>
+        
     </div>
 </div>
     <div id="main-content" class="row">
@@ -210,9 +236,18 @@ commentsRunWhenDOMLoaded(addUtterances);
         
               <div>
                 
-  <div class="section" id="smoothed-infonce">
-<h1>Smoothed-InfoNCE<a class="headerlink" href="#smoothed-infonce" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="smoothed-infonce-breaking-the-log-n-curse-without-overshooting">
+<h1>Smoothed InfoNCE: Breaking the log N Curse without Overshooting<a class="headerlink" href="#smoothed-infonce-breaking-the-log-n-curse-without-overshooting" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="background">
+<h2>Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h2>
+<p>We revisit the <span class="math notranslate nohighlight">\(\log N\)</span> bound of InfoNCE, which sets an upper limit on the estimator thereby often causing the estimator to return an under-estimate of the mutual information. We show that the existing solution of excluding data samples from the reference set causes an equally debilitating problem, namely, it causes the estimator to overshoot, often with no sign of convergence, thereby leading to an over-estimate of the mutual information.</p>
+<p>We illustrate the undershooting problem and overshooting problem of InfoNCE in infonce.ipynb.</p>
+</div>
+<div class="section" id="proposed-model-smoothed-infonce">
+<h2>Proposed Model: Smoothed InfoNCE<a class="headerlink" href="#proposed-model-smoothed-infonce" title="Permalink to this headline">¶</a></h2>
+<p>We conduct the experiments on estimating mutual information for high-dimensional Gaussian data. The results show that our model can successfully break the log N curse of InfoNCE without overshooting to infinity.</p>
 <div class="toctree-wrapper compound">
+</div>
 </div>
 </div>
 

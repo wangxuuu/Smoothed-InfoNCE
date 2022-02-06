@@ -91,8 +91,8 @@ commentsRunWhenDOMLoaded(addUtterances);
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Apply label smoothing to infoNCE" href="smoothed_infoNCE.html" />
-    <link rel="prev" title="Smoothed-InfoNCE" href="README.html" />
+    <link rel="next" title="Smoothed InfoNCE" href="smoothed_infoNCE.html" />
+    <link rel="prev" title="Smoothed InfoNCE: Breaking the log N Curse without Overshooting" href="README.html" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
@@ -121,7 +121,7 @@ commentsRunWhenDOMLoaded(addUtterances);
     <ul class="nav sidenav_l1">
  <li class="toctree-l1">
   <a class="reference internal" href="README.html">
-   Smoothed-InfoNCE
+   Smoothed InfoNCE: Breaking the log N Curse without Overshooting
   </a>
  </li>
 </ul>
@@ -133,12 +133,17 @@ commentsRunWhenDOMLoaded(addUtterances);
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="smoothed_infoNCE.html">
-   Apply label smoothing to infoNCE
+   Smoothed InfoNCE
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="smoothed_infoNCE.html#train-decision-tree">
-   Train Decision Tree
+  <a class="reference internal" href="smoothed_infoNCE.html#setup">
+   Setup
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="smoothed_infoNCE.html#initialize-the-model">
+   Initialize the model.
   </a>
  </li>
 </ul>
@@ -248,8 +253,8 @@ commentsRunWhenDOMLoaded(addUtterances);
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#model">
-   Model
+  <a class="reference internal nav-link" href="#initialize-the-model">
+   Initialize the Model
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -263,18 +268,13 @@ commentsRunWhenDOMLoaded(addUtterances);
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#infonce-w-o-datasamples">
-   InfoNCE w\o datasamples
+  <a class="reference internal nav-link" href="#infonce-w-o-data-samples-exclusion">
+   InfoNCE w\o data samples (exclusion)
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#ground-truth-heapmap">
    Ground Truth Heapmap
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#infonce-with-gt-reference-distribution">
-   InfoNCE with GT reference distribution
   </a>
  </li>
 </ul>
@@ -361,6 +361,7 @@ commentsRunWhenDOMLoaded(addUtterances);
 </div>
 </div>
 </div>
+<p>Generate the data.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">GaussianData</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">sample_size</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="n">opt</span><span class="o">.</span><span class="n">d</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="n">opt</span><span class="o">.</span><span class="n">rho</span><span class="p">)</span>
@@ -370,8 +371,8 @@ commentsRunWhenDOMLoaded(addUtterances);
 </div>
 </div>
 </div>
-<div class="section" id="model">
-<h2>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="initialize-the-model">
+<h2>Initialize the Model<a class="headerlink" href="#initialize-the-model" title="Permalink to this headline">¶</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;./results/InfoNCE_dim</span><span class="si">{</span><span class="n">opt</span><span class="o">.</span><span class="n">d</span><span class="si">}</span><span class="s1">_reg</span><span class="si">{</span><span class="n">opt</span><span class="o">.</span><span class="n">reg</span><span class="si">}</span><span class="s1">&#39;</span>   <span class="c1"># filename</span>
@@ -392,6 +393,7 @@ commentsRunWhenDOMLoaded(addUtterances);
 </div>
 </div>
 </div>
+<p>Define the original InfoNCE loss function and its exclusion version</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">infonce_loss</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">x_samples</span><span class="p">,</span> <span class="n">y_samples</span><span class="p">,</span> <span class="n">writer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">epoch</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reg</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -445,8 +447,7 @@ commentsRunWhenDOMLoaded(addUtterances);
 <p>Load previous results.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load_available = True # set to False to prevent loading previous results</span>
-<span class="k">if</span> <span class="n">load_available</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">chkpt_name</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">load_available</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">chkpt_name</span><span class="p">):</span>
     <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
         <span class="n">chkpt_name</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
     <span class="n">mi_list</span> <span class="o">=</span> <span class="n">checkpoint</span><span class="p">[</span><span class="s1">&#39;mi_list&#39;</span><span class="p">]</span>
@@ -482,19 +483,10 @@ f(x,y)=\log \frac{p_{Y|X}(y|x)}{p_{Y}(y)} + c \quad \forall x\in \mathcal{X}, y 
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># continue_train = True  # set to True to continue to train</span>
 <span class="k">if</span> <span class="n">continue_train</span><span class="p">:</span>
     <span class="n">iter_</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="c1"># for i in range(opt.n_epoch):</span>
-    <span class="c1">#     # idx = torch.randperm(opt.sample_size)</span>
-    <span class="c1">#     idx = np.random.permutation(opt.sample_size)</span>
-    <span class="c1">#     # idx_X, idx_Y = randerange(opt.sample_size)</span>
-    <span class="c1">#     for j in range(opt.n_iters_1epoch):</span>
-    <span class="c1">#         batch_idx = idx[j::opt.n_iters_1epoch]</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">n_epoch</span><span class="o">*</span><span class="n">opt</span><span class="o">.</span><span class="n">n_iters_1epoch</span><span class="p">):</span>
         <span class="n">data_joint</span> <span class="o">=</span> <span class="n">resample</span><span class="p">(</span><span class="n">XY</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">opt</span><span class="o">.</span><span class="n">batch_size</span><span class="p">)</span>
-            <span class="c1"># train_x = X[batch_idx]</span>
-            <span class="c1"># train_y = Y[batch_idx]</span>
         <span class="n">train_x</span> <span class="o">=</span> <span class="n">data_joint</span><span class="p">[:,</span><span class="mi">0</span><span class="p">:</span><span class="n">opt</span><span class="o">.</span><span class="n">d</span><span class="p">]</span>
         <span class="n">train_y</span> <span class="o">=</span> <span class="n">data_joint</span><span class="p">[:,</span><span class="n">opt</span><span class="o">.</span><span class="n">d</span><span class="p">:]</span>
-
         <span class="n">optimizer_D</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">infonce_loss</span><span class="p">(</span><span class="n">discriminator</span><span class="p">,</span> <span class="n">train_x</span><span class="p">,</span> <span class="n">train_y</span><span class="p">,</span> <span class="n">reg</span><span class="o">=</span><span class="n">opt</span><span class="o">.</span><span class="n">reg</span><span class="p">)</span> <span class="c1"># negative infonce_bound as the loss</span>
         <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
@@ -515,11 +507,9 @@ f(x,y)=\log \frac{p_{Y|X}(y|x)}{p_{Y}(y)} + c \quad \forall x\in \mathcal{X}, y 
             <span class="n">writer</span><span class="o">.</span><span class="n">add_histogram</span><span class="p">(</span><span class="s1">&#39;first layer&#39;</span><span class="p">,</span> <span class="n">discriminator</span><span class="o">.</span><span class="n">fc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
             <span class="n">writer</span><span class="o">.</span><span class="n">add_histogram</span><span class="p">(</span><span class="s1">&#39;second layer&#39;</span><span class="p">,</span> <span class="n">discriminator</span><span class="o">.</span><span class="n">fc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
             <span class="n">writer</span><span class="o">.</span><span class="n">add_histogram</span><span class="p">(</span><span class="s1">&#39;third layer&#39;</span><span class="p">,</span> <span class="n">discriminator</span><span class="o">.</span><span class="n">fc</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
-
             <span class="n">writer</span><span class="o">.</span><span class="n">add_histogram</span><span class="p">(</span><span class="s1">&#39;first layer (grad)&#39;</span><span class="p">,</span> <span class="n">discriminator</span><span class="o">.</span><span class="n">fc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
             <span class="n">writer</span><span class="o">.</span><span class="n">add_histogram</span><span class="p">(</span><span class="s1">&#39;second layer (grad)&#39;</span><span class="p">,</span> <span class="n">discriminator</span><span class="o">.</span><span class="n">fc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
             <span class="n">writer</span><span class="o">.</span><span class="n">add_histogram</span><span class="p">(</span><span class="s1">&#39;third layer (grad)&#39;</span><span class="p">,</span> <span class="n">discriminator</span><span class="o">.</span><span class="n">fc</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
-
 
 <span class="c1"># writer.add_graph(discriminator, (XY,))</span>
 <span class="n">writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -529,8 +519,7 @@ f(x,y)=\log \frac{p_{Y|X}(y|x)}{p_{Y}(y)} + c \quad \forall x\in \mathcal{X}, y 
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># overwrite = True  # set to True to overwrite previously stored results</span>
-<span class="k">if</span> <span class="n">overwrite</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">chkpt_name</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">overwrite</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">chkpt_name</span><span class="p">):</span>
     <span class="n">model_state</span> <span class="o">=</span> <span class="n">discriminator</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
     <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">({</span>
         <span class="s1">&#39;mi_list&#39;</span><span class="p">:</span> <span class="n">mi_list</span><span class="p">,</span>
@@ -538,11 +527,6 @@ f(x,y)=\log \frac{p_{Y|X}(y|x)}{p_{Y}(y)} + c \quad \forall x\in \mathcal{X}, y 
     <span class="p">},</span> <span class="n">chkpt_name</span><span class="p">)</span>
     <span class="n">writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Current results saved.&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Current results saved.
 </pre></div>
 </div>
 </div>
@@ -573,73 +557,31 @@ f(x,y)=\log \frac{p_{Y|X}(y|x)}{p_{Y}(y)} + c \quad \forall x\in \mathcal{X}, y 
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;number of iterations&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;MI estimation&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;./results/InfoNCE_dim</span><span class="si">{</span><span class="n">opt</span><span class="o">.</span><span class="n">d</span><span class="si">}</span><span class="s1">_reg</span><span class="si">{</span><span class="n">opt</span><span class="o">.</span><span class="n">reg</span><span class="si">}</span><span class="s1">.pdf&#39;</span><span class="p">)</span>
+<span class="c1"># plt.savefig(f&#39;./results/InfoNCE_dim{opt.d}_reg{opt.reg}.pdf&#39;)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/infonce_25_0.png" src="_images/infonce_25_0.png" />
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_subfigure</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">dimX</span><span class="p">,</span> <span class="n">dimY</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xmin</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="n">xmax</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">ymin</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="n">ymax</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">xgrids</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">ygrids</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show_details</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    The inputs should be X and Y, which are the coordinates of the points.</span>
-
-<span class="sd">    net should be a neural network with Tensor inputs.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">if</span>  <span class="n">x0</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-    <span class="k">if</span> <span class="n">y0</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">y0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">Y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-
-    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span><span class="n">xmin</span><span class="p">:</span><span class="n">xmax</span><span class="p">:</span><span class="n">xgrids</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span><span class="p">,</span> <span class="n">ymin</span><span class="p">:</span><span class="n">ymax</span><span class="p">:</span><span class="n">ygrids</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span><span class="p">]</span>
-    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-        <span class="n">z</span> <span class="o">=</span> <span class="p">(</span><span class="n">net</span><span class="p">(</span>
-            <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="n">dimX</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span>
-                    <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">x0</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">DEVICE</span><span class="p">),</span>
-            <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="n">dimY</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span>
-                    <span class="n">y</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">y0</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">DEVICE</span><span class="p">),</span>
-        <span class="p">),</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
-    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
-
-    <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">40</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;RdBu_r&quot;</span><span class="p">,</span> <span class="n">shading</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span>
-    <span class="c1"># ax.figure.colorbar(im)</span>
-    <span class="k">if</span> <span class="n">show_details</span><span class="p">:</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;$x^{{(</span><span class="si">{0}</span><span class="s2">)}}-x_0^{{(</span><span class="si">{0}</span><span class="s2">)}}$&quot;</span><span class="p">,</span>
-                <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;$x^{{(</span><span class="si">{0}</span><span class="s2">)}}-x_0^{{(</span><span class="si">{0}</span><span class="s2">)}}$&quot;</span><span class="p">,</span>
-                <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Heatmap of $t(x,y)$&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">im</span>
-
-<span class="k">def</span> <span class="nf">plot_fig</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="mi">6</span><span class="p">):</span>
-    <span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="n">d</span><span class="p">,</span><span class="n">ncols</span><span class="o">=</span><span class="n">d</span><span class="p">,</span><span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
-            <span class="n">im</span> <span class="o">=</span> <span class="n">plot_subfigure</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">dimX</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">dimY</span><span class="o">=</span><span class="n">j</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xmin</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="n">xmax</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">ymin</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="n">ymax</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">xgrids</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">ygrids</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span> <span class="n">show_details</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
-    <span class="k">return</span> <span class="n">f</span>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x7f641c2fb2d0&gt;
 </pre></div>
 </div>
+<img alt="_images/infonce_27_1.png" src="_images/infonce_27_1.png" />
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">heatmap</span> <span class="o">=</span> <span class="n">plot_fig</span><span class="p">(</span><span class="n">discriminator</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">heatmap</span> <span class="o">=</span> <span class="n">plot_fig</span><span class="p">(</span><span class="n">discriminator</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">40</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
 <span class="c1"># plt.savefig(f&#39;./results/heatmap_InfoNCE_dim{opt.d}_reg{opt.reg}.pdf&#39;)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/infonce_27_0.png" src="_images/infonce_27_0.png" />
+<img alt="_images/infonce_28_0.png" src="_images/infonce_28_0.png" />
 </div>
 </div>
 </div>
-<div class="section" id="infonce-w-o-datasamples">
-<h2>InfoNCE w\o datasamples<a class="headerlink" href="#infonce-w-o-datasamples" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="infonce-w-o-data-samples-exclusion">
+<h2>InfoNCE w\o data samples (exclusion)<a class="headerlink" href="#infonce-w-o-data-samples-exclusion" title="Permalink to this headline">¶</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;./results/InfoNCE_exc_dim</span><span class="si">{</span><span class="n">opt</span><span class="o">.</span><span class="n">d</span><span class="si">}</span><span class="s1">_reg</span><span class="si">{</span><span class="n">opt</span><span class="o">.</span><span class="n">reg</span><span class="si">}</span><span class="s1">&#39;</span>   <span class="c1"># filename</span>
@@ -675,11 +617,15 @@ f(x,y)=\log \frac{p_{Y|X}(y|x)}{p_{Y}(y)} + c \quad \forall x\in \mathcal{X}, y 
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Previous results loaded.
+</pre></div>
+</div>
+</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># continue_train = True  # set to True to continue to train</span>
-<span class="k">if</span> <span class="n">continue_train</span><span class="p">:</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">continue_train</span><span class="p">:</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">n_epoch</span><span class="o">*</span><span class="n">opt</span><span class="o">.</span><span class="n">n_iters_1epoch</span><span class="p">):</span>
         <span class="n">data_joint</span> <span class="o">=</span> <span class="n">resample</span><span class="p">(</span><span class="n">XY</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">opt</span><span class="o">.</span><span class="n">batch_size</span><span class="p">)</span>
         <span class="n">train_x</span> <span class="o">=</span> <span class="n">data_joint</span><span class="p">[:,</span><span class="mi">0</span><span class="p">:</span><span class="n">opt</span><span class="o">.</span><span class="n">d</span><span class="p">]</span>
@@ -703,37 +649,12 @@ f(x,y)=\log \frac{p_{Y|X}(y|x)}{p_{Y}(y)} + c \quad \forall x\in \mathcal{X}, y 
             <span class="n">writer</span><span class="o">.</span><span class="n">add_histogram</span><span class="p">(</span><span class="s1">&#39;first layer&#39;</span><span class="p">,</span> <span class="n">discriminator2</span><span class="o">.</span><span class="n">fc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
             <span class="n">writer</span><span class="o">.</span><span class="n">add_histogram</span><span class="p">(</span><span class="s1">&#39;second layer&#39;</span><span class="p">,</span> <span class="n">discriminator2</span><span class="o">.</span><span class="n">fc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
             <span class="n">writer</span><span class="o">.</span><span class="n">add_histogram</span><span class="p">(</span><span class="s1">&#39;third layer&#39;</span><span class="p">,</span> <span class="n">discriminator2</span><span class="o">.</span><span class="n">fc</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
-
             <span class="n">writer</span><span class="o">.</span><span class="n">add_histogram</span><span class="p">(</span><span class="s1">&#39;first layer (grad)&#39;</span><span class="p">,</span> <span class="n">discriminator2</span><span class="o">.</span><span class="n">fc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
             <span class="n">writer</span><span class="o">.</span><span class="n">add_histogram</span><span class="p">(</span><span class="s1">&#39;second layer (grad)&#39;</span><span class="p">,</span> <span class="n">discriminator2</span><span class="o">.</span><span class="n">fc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
             <span class="n">writer</span><span class="o">.</span><span class="n">add_histogram</span><span class="p">(</span><span class="s1">&#39;third layer (grad)&#39;</span><span class="p">,</span> <span class="n">discriminator2</span><span class="o">.</span><span class="n">fc</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
 
 <span class="c1"># writer.add_graph(discriminator2, (XY,))</span>
 <span class="n">writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Iternation: 0, loss: 0.026040, mi_est: -0.002494
-Iternation: 1000, loss: -5.127612, mi_est: 5.160129
-Iternation: 2000, loss: -11.372650, mi_est: 5.231303
-Iternation: 3000, loss: -12.064240, mi_est: 6.631378
-Iternation: 4000, loss: -9.311867, mi_est: 5.857926
-Iternation: 5000, loss: 28.395718, mi_est: 3.251190
-Iternation: 6000, loss: -17.928013, mi_est: 6.896912
-Iternation: 7000, loss: -25.686893, mi_est: 7.904385
-Iternation: 8000, loss: -35.631805, mi_est: 8.406637
-Iternation: 9000, loss: -1.615753, mi_est: 8.793091
-Iternation: 10000, loss: -26.837381, mi_est: 9.671806
-Iternation: 11000, loss: -28.242912, mi_est: 8.816132
-Iternation: 12000, loss: -39.168335, mi_est: 10.215359
-Iternation: 13000, loss: -31.787321, mi_est: 9.407356
-Iternation: 14000, loss: -24.669666, mi_est: 11.416431
-Iternation: 15000, loss: -40.059082, mi_est: 10.831223
-Iternation: 16000, loss: -12.485273, mi_est: 11.424274
-Iternation: 17000, loss: -34.446110, mi_est: 12.444870
-Iternation: 18000, loss: -45.216640, mi_est: 12.426109
-Iternation: 19000, loss: -34.593361, mi_est: 11.755962
 </pre></div>
 </div>
 </div>
@@ -761,79 +682,40 @@ Iternation: 19000, loss: -34.593361, mi_est: 11.755962
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Current results saved.
-</pre></div>
-</div>
-</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mi_copy2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;MI estimate&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">Ground_truth</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Ground Truth&#39;</span><span class="p">,</span><span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">sample_size</span><span class="p">),</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;log $n$&#39;</span><span class="p">,</span><span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;grey&#39;</span><span class="p">)</span>
-<span class="c1"># for t in range(len(mi_copy)):</span>
-<span class="c1">#     if (mi_copy[t]&gt;.8*Ground_truth):</span>
-<span class="c1">#         plt.axvline(t,label=&#39;80% reached&#39;,linestyle=&#39;:&#39;,color=&#39;green&#39;)</span>
-<span class="c1">#         break</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;number of iterations&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;MI estimation&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;./results/InfoNCE_exc_dim</span><span class="si">{</span><span class="n">opt</span><span class="o">.</span><span class="n">d</span><span class="si">}</span><span class="s1">_reg</span><span class="si">{</span><span class="n">opt</span><span class="o">.</span><span class="n">reg</span><span class="si">}</span><span class="s1">.pdf&#39;</span><span class="p">)</span>
+<span class="c1"># plt.savefig(f&#39;./results/InfoNCE_exc_dim{opt.d}_reg{opt.reg}.pdf&#39;)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/infonce_34_0.png" src="_images/infonce_34_0.png" />
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x7f63ccfa8b50&gt;
+</pre></div>
+</div>
+<img alt="_images/infonce_35_1.png" src="_images/infonce_35_1.png" />
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">heatmap</span> <span class="o">=</span> <span class="n">plot_fig</span><span class="p">(</span><span class="n">discriminator2</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;./results/heatmap_InfoNCE_exc_dim</span><span class="si">{</span><span class="n">opt</span><span class="o">.</span><span class="n">d</span><span class="si">}</span><span class="s1">_reg</span><span class="si">{</span><span class="n">opt</span><span class="o">.</span><span class="n">reg</span><span class="si">}</span><span class="s1">.pdf&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">heatmap</span> <span class="o">=</span> <span class="n">plot_fig</span><span class="p">(</span><span class="n">discriminator2</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">8000</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="c1"># plt.savefig(f&#39;./results/heatmap_InfoNCE_exc_dim{opt.d}_reg{opt.reg}.pdf&#39;)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/infonce_35_0.png" src="_images/infonce_35_0.png" />
+<img alt="_images/infonce_36_0.png" src="_images/infonce_36_0.png" />
 </div>
 </div>
 </div>
 <div class="section" id="ground-truth-heapmap">
 <h2>Ground Truth Heapmap<a class="headerlink" href="#ground-truth-heapmap" title="Permalink to this headline">¶</a></h2>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_subfigure_GT</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">dimX</span><span class="p">,</span> <span class="n">dimY</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xmin</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="n">xmax</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">ymin</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="n">ymax</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">xgrids</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">ygrids</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show_details</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    net: GT_logratio</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span>  <span class="n">x0</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-    <span class="k">if</span> <span class="n">y0</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">y0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">Y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-        
-    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span><span class="n">xmin</span><span class="p">:</span><span class="n">xmax</span><span class="p">:</span><span class="n">xgrids</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span><span class="p">,</span> <span class="n">ymin</span><span class="p">:</span><span class="n">ymax</span><span class="p">:</span><span class="n">ygrids</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span><span class="p">]</span>
-    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-        <span class="n">z</span> <span class="o">=</span> <span class="p">(</span><span class="n">net</span><span class="p">(</span>
-            <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="n">dimX</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span>
-                    <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">x0</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">DEVICE</span><span class="p">),</span>
-            <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="n">dimY</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span>
-                    <span class="n">y</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">y0</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">DEVICE</span><span class="p">),</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
-    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
-    <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;RdBu_r&quot;</span><span class="p">,</span> <span class="n">shading</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">200</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">show_details</span><span class="p">:</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">)</span> 
-        <span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;$x^{{(</span><span class="si">{0}</span><span class="s2">)}}-x_0^{{(</span><span class="si">{0}</span><span class="s2">)}}$&quot;</span><span class="p">,</span>
-                <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;$x^{{(</span><span class="si">{0}</span><span class="s2">)}}-x_0^{{(</span><span class="si">{0}</span><span class="s2">)}}$&quot;</span><span class="p">,</span>
-                <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Heatmap of $t(x,y)$&quot;</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">im</span>
-</pre></div>
-</div>
-</div>
-</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">GT</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
@@ -853,221 +735,14 @@ Iternation: 19000, loss: -34.593361, mi_est: 11.755962
     <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
         <span class="n">im</span> <span class="o">=</span> <span class="n">plot_subfigure_GT</span><span class="p">(</span><span class="n">GT</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">dimX</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">dimY</span><span class="o">=</span><span class="n">j</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xmin</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="n">xmax</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">ymin</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="n">ymax</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">xgrids</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">ygrids</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span> <span class="n">show_details</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-<span class="c1"># plt.savefig(f&#39;results/InfoNCE_trueref_heatmap_dim{opt.d}.pdf&#39;)</span>
-<span class="c1"># im = plot_subfigure_GT(GT_logratio, X, Y, dimX=4, dimY=5, x0=None, y0=None, xmin=-5, xmax=5, ymin=-5, ymax=5, xgrids=50, ygrids=50, ax=axs[i, j], show_details=False)</span>
 <span class="n">f</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;./results/GT_heatmap_dim</span><span class="si">{</span><span class="n">opt</span><span class="o">.</span><span class="n">d</span><span class="si">}</span><span class="s1">.pdf&#39;</span><span class="p">)</span>
+<span class="c1"># plt.savefig(f&#39;./results/GT_heatmap_dim{opt.d}.pdf&#39;)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <img alt="_images/infonce_39_0.png" src="_images/infonce_39_0.png" />
-</div>
-</div>
-</div>
-<div class="section" id="infonce-with-gt-reference-distribution">
-<h2>InfoNCE with GT reference distribution<a class="headerlink" href="#infonce-with-gt-reference-distribution" title="Permalink to this headline">¶</a></h2>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">discriminator3</span> <span class="o">=</span> <span class="n">Net</span><span class="p">(</span><span class="n">input_size</span><span class="o">=</span><span class="n">opt</span><span class="o">.</span><span class="n">d</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="n">hidden_size</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
-
-<span class="c1"># move NN model to GPU if GPU is available</span>
-<span class="k">if</span> <span class="n">cuda</span><span class="p">:</span>
-    <span class="n">discriminator3</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
-
-<span class="c1"># Adam optimizer</span>
-<span class="n">optimizer_D</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">discriminator3</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">opt</span><span class="o">.</span><span class="n">lr</span><span class="p">,</span> <span class="n">betas</span><span class="o">=</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">b1</span><span class="p">,</span> <span class="n">opt</span><span class="o">.</span><span class="n">b2</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;./results/InfoNCE_knownref_dim</span><span class="si">{</span><span class="n">opt</span><span class="o">.</span><span class="n">d</span><span class="si">}</span><span class="s1">&#39;</span>   <span class="c1"># filename</span>
-<span class="n">chkpt_name</span> <span class="o">=</span> <span class="n">name</span><span class="o">+</span><span class="s1">&#39;.pt&#39;</span>      <span class="c1"># checkpoint</span>
-<span class="n">writer</span> <span class="o">=</span> <span class="n">SummaryWriter</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;./results/log/InfoNCE_knownref_dim</span><span class="si">{</span><span class="n">opt</span><span class="o">.</span><span class="n">d</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-
-
-<span class="c1"># load_available = True # set to False to prevent loading previous results</span>
-<span class="k">if</span> <span class="n">load_available</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">chkpt_name</span><span class="p">):</span>
-    <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
-        <span class="n">chkpt_name</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
-    <span class="n">mi_list</span> <span class="o">=</span> <span class="n">checkpoint</span><span class="p">[</span><span class="s1">&#39;mi_list&#39;</span><span class="p">]</span>
-    <span class="n">model_state</span> <span class="o">=</span> <span class="n">checkpoint</span><span class="p">[</span><span class="s1">&#39;model_state&#39;</span><span class="p">]</span>
-    <span class="n">discriminator3</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">model_state</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Previous results loaded.&#39;</span><span class="p">)</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="n">mi_list</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># storing the mi estimation of each iteration</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">estimate_withGT</span><span class="p">(</span><span class="n">Net</span><span class="p">,</span> <span class="n">jointdata</span><span class="p">,</span> <span class="n">marginaldata</span><span class="p">):</span>
-    <span class="n">L</span> <span class="o">=</span> <span class="n">Net</span><span class="p">(</span><span class="n">jointdata</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-    <span class="n">L_</span> <span class="o">=</span> <span class="n">discriminator3</span><span class="p">(</span><span class="n">marginaldata</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">jointdata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">jointdata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">logsumexp</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">jointdata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">L</span> <span class="o">-</span> <span class="n">L_</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">sample_size</span><span class="p">)</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">GaussianData</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">sample_size</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="n">opt</span><span class="o">.</span><span class="n">d</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="n">opt</span><span class="o">.</span><span class="n">rho</span><span class="p">)</span>
-<span class="n">data2</span> <span class="o">=</span> <span class="n">GaussianData</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">sample_size</span><span class="o">*</span><span class="n">opt</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="n">opt</span><span class="o">.</span><span class="n">d</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="n">opt</span><span class="o">.</span><span class="n">rho</span><span class="p">)</span>
-<span class="n">ref_Y</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">Y</span>
-<span class="n">ref_X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">sample_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="n">ref_data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">ref_X</span><span class="p">,</span> <span class="n">ref_Y</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-
-<span class="c1"># continue_train = True  # set to True to continue to train</span>
-<span class="n">_iter</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="k">if</span> <span class="n">continue_train</span><span class="p">:</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">n_epoch</span><span class="p">):</span>
-        <span class="n">idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">sample_size</span><span class="p">)</span>
-
-        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">n_iters_1epoch</span><span class="p">):</span>
-            <span class="n">optimizer_D</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-            <span class="n">batch_idx</span> <span class="o">=</span> <span class="n">idx</span><span class="p">[</span><span class="n">j</span><span class="p">::</span><span class="n">opt</span><span class="o">.</span><span class="n">n_iters_1epoch</span><span class="p">]</span>
-            <span class="n">batch_X</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">batch_idx</span><span class="p">]</span>
-            <span class="n">batch_Y</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[</span><span class="n">batch_idx</span><span class="p">]</span>
-
-            <span class="n">batch_X_ref</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">batch_idx</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span>
-                <span class="n">opt</span><span class="o">.</span><span class="n">sample_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span>
-            <span class="n">batch_Y_ref</span> <span class="o">=</span> <span class="n">data2</span><span class="o">.</span><span class="n">Y</span>
-            <span class="n">batch_Y_ref</span> <span class="o">=</span> <span class="n">batch_Y_ref</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,)</span> <span class="o">+</span> <span class="n">batch_X_ref</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
-            <span class="c1"># define the loss</span>
-            <span class="n">L</span> <span class="o">=</span> <span class="o">-</span><span class="n">discriminator3</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">batch_X</span><span class="p">,</span> <span class="n">batch_Y</span><span class="p">),</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-            <span class="n">L_</span> <span class="o">=</span> <span class="n">discriminator3</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">batch_X_ref</span><span class="p">,</span> <span class="n">batch_Y_ref</span><span class="p">),</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
-                    <span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">sample_size</span><span class="p">,</span> <span class="n">batch_idx</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                        <span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">logsumexp</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">batch_Y_ref</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-            <span class="n">loss</span> <span class="o">=</span> <span class="n">L</span> <span class="o">+</span> <span class="n">L_</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-            <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-
-            <span class="n">optimizer_D</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-            <span class="n">writer</span><span class="o">.</span><span class="n">add_scalar</span><span class="p">(</span><span class="s2">&quot;Loss/train&quot;</span><span class="p">,</span>
-                                    <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span>
-                                    <span class="n">global_step</span><span class="o">=</span><span class="n">_iter</span><span class="p">)</span>
-            <span class="n">writer</span><span class="o">.</span><span class="n">add_scalar</span><span class="p">(</span><span class="s2">&quot;L&quot;</span><span class="p">,</span> <span class="n">L</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">global_step</span><span class="o">=</span><span class="n">_iter</span><span class="p">)</span>
-            <span class="n">writer</span><span class="o">.</span><span class="n">add_scalar</span><span class="p">(</span><span class="s2">&quot;L_.mean()&quot;</span><span class="p">,</span>
-                                    <span class="n">L_</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span>
-                                    <span class="n">global_step</span><span class="o">=</span><span class="n">_iter</span><span class="p">)</span>
-            <span class="n">_iter</span> <span class="o">+=</span> <span class="mi">1</span>
-
-            <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-                <span class="n">mi_est</span> <span class="o">=</span> <span class="n">estimate_withGT</span><span class="p">(</span><span class="n">discriminator3</span><span class="p">,</span> <span class="n">XY</span><span class="p">,</span> <span class="n">ref_data</span><span class="p">)</span>
-
-            <span class="n">mi_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mi_est</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
-            <span class="n">writer</span><span class="o">.</span><span class="n">add_scalar</span><span class="p">(</span><span class="s1">&#39;mi_list&#39;</span><span class="p">,</span> <span class="n">mi_est</span><span class="p">,</span> <span class="n">_iter</span><span class="p">)</span>
-            <span class="n">writer</span><span class="o">.</span><span class="n">add_scalar</span><span class="p">(</span><span class="s1">&#39;loss&#39;</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">_iter</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">_iter</span><span class="o">%</span><span class="k">500</span>==0:
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Iternation: </span><span class="si">%d</span><span class="s2">, loss: </span><span class="si">%f</span><span class="s2">, mi_est: </span><span class="si">%f</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">_iter</span><span class="p">,</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">mi_est</span><span class="p">))</span>
-
-<span class="n">writer</span><span class="o">.</span><span class="n">add_graph</span><span class="p">(</span><span class="n">discriminator3</span><span class="p">,</span> <span class="p">(</span><span class="n">XY</span><span class="p">,))</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Iternation: 500, loss: -665.835571, mi_est: 456.018829
-Iternation: 1000, loss: -9209.822266, mi_est: 6776.464844
-Iternation: 1500, loss: -34778.976562, mi_est: 25535.050781
-Iternation: 2000, loss: -83923.773438, mi_est: 60833.148438
-Iternation: 2500, loss: -156567.343750, mi_est: 113942.789062
-Iternation: 3000, loss: -249548.250000, mi_est: 185848.718750
-Iternation: 3500, loss: -386537.000000, mi_est: 277739.218750
-Iternation: 4000, loss: -566278.687500, mi_est: 390238.500000
-Iternation: 4500, loss: -686959.500000, mi_est: 524799.812500
-Iternation: 5000, loss: -946937.812500, mi_est: 682045.625000
-Iternation: 5500, loss: -1159350.125000, mi_est: 863011.500000
-Iternation: 6000, loss: -1456032.000000, mi_est: 1069179.250000
-Iternation: 6500, loss: -1791936.000000, mi_est: 1300582.625000
-Iternation: 7000, loss: -2007175.500000, mi_est: 1559155.625000
-Iternation: 7500, loss: -2407509.500000, mi_est: 1845497.375000
-Iternation: 8000, loss: -2891269.500000, mi_est: 2160693.750000
-Iternation: 8500, loss: -3376938.000000, mi_est: 2507120.750000
-Iternation: 9000, loss: -3929145.000000, mi_est: 2884900.500000
-Iternation: 9500, loss: -4203800.000000, mi_est: 3293971.750000
-Iternation: 10000, loss: -5091103.500000, mi_est: 3735589.000000
-Iternation: 10500, loss: -5570498.000000, mi_est: 4212076.000000
-Iternation: 11000, loss: -6354780.500000, mi_est: 4725968.500000
-Iternation: 11500, loss: -7007142.000000, mi_est: 5274973.000000
-Iternation: 12000, loss: -8145779.000000, mi_est: 5860416.000000
-Iternation: 12500, loss: -9056555.000000, mi_est: 6490295.500000
-Iternation: 13000, loss: -8992583.000000, mi_est: 7152863.500000
-Iternation: 13500, loss: -10986401.000000, mi_est: 7860963.000000
-Iternation: 14000, loss: -10815424.000000, mi_est: 8610132.000000
-Iternation: 14500, loss: -12122842.000000, mi_est: 9401845.000000
-Iternation: 15000, loss: -13691544.000000, mi_est: 10237920.000000
-Iternation: 15500, loss: -14814516.000000, mi_est: 11117797.000000
-Iternation: 16000, loss: -16717990.000000, mi_est: 12042857.000000
-Iternation: 16500, loss: -18928408.000000, mi_est: 13021617.000000
-Iternation: 17000, loss: -18722866.000000, mi_est: 14044608.000000
-Iternation: 17500, loss: -21461348.000000, mi_est: 15114290.000000
-Iternation: 18000, loss: -21992870.000000, mi_est: 16235706.000000
-Iternation: 18500, loss: -22818904.000000, mi_est: 17407360.000000
-Iternation: 19000, loss: -25860482.000000, mi_est: 18635150.000000
-Iternation: 19500, loss: -27702364.000000, mi_est: 19914520.000000
-Iternation: 20000, loss: -29231522.000000, mi_est: 21246790.000000
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">overwrite</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># set to True to overwrite previously stored results</span>
-<span class="k">if</span> <span class="n">overwrite</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">chkpt_name</span><span class="p">):</span>
-    <span class="n">model_state</span> <span class="o">=</span> <span class="n">discriminator3</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
-    <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">({</span>
-        <span class="s1">&#39;mi_list&#39;</span><span class="p">:</span> <span class="n">mi_list</span><span class="p">,</span>
-        <span class="s1">&#39;model_state&#39;</span><span class="p">:</span> <span class="n">model_state</span>
-    <span class="p">},</span> <span class="n">chkpt_name</span><span class="p">)</span>
-    <span class="n">writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Current results saved.&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Current results saved.
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mi_copy3</span> <span class="o">=</span> <span class="n">mi_list</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">mi_list</span><span class="p">)):</span>
-    <span class="n">mi_copy3</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">ma_rate</span><span class="p">)</span> <span class="o">*</span> <span class="n">mi_copy3</span><span class="p">[</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">ma_rate</span> <span class="o">*</span> <span class="n">mi_copy3</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">std</span> <span class="o">=</span> <span class="mf">0.183</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mi_copy3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;MI estimate with reference distribution&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mi_copy2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;MI estimate with exclusion&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mi_copy</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;MI estimate w/o exclusion&#39;</span><span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">Ground_truth</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">std</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;ground truth + 2 std&#39;</span><span class="p">,</span><span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;lightblue&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">Ground_truth</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">std</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;ground truth - 2 std&#39;</span><span class="p">,</span><span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;lightblue&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">Ground_truth</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;ground truth&#39;</span><span class="p">,</span><span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">sample_size</span><span class="p">),</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;log $n$&#39;</span><span class="p">,</span><span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;grey&#39;</span><span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;number of iterations&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;MI estimation&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Mi estimation with InfoNCE&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-<span class="c1"># plt.savefig(f&#39;results/InfoNCE_wo_datapoints_dim{opt.d}_ma{ma_rate}.pdf&#39;)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x7f2175882ad0&gt;
-</pre></div>
-</div>
-<img alt="_images/infonce_47_1.png" src="_images/infonce_47_1.png" />
 </div>
 </div>
 </div>
@@ -1101,8 +776,8 @@ Iternation: 20000, loss: -29231522.000000, mi_est: 21246790.000000
     
     <div class='prev-next-bottom'>
         
-    <a class='left-prev' id="prev-link" href="README.html" title="previous page">Smoothed-InfoNCE</a>
-    <a class='right-next' id="next-link" href="smoothed_infoNCE.html" title="next page">Apply label smoothing to infoNCE</a>
+    <a class='left-prev' id="prev-link" href="README.html" title="previous page">Smoothed InfoNCE: Breaking the log N Curse without Overshooting</a>
+    <a class='right-next' id="next-link" href="smoothed_infoNCE.html" title="next page">Smoothed InfoNCE</a>
 
     </div>
     <footer class="footer mt-5 mt-md-0">
