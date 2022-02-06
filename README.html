@@ -64,7 +64,7 @@ var addUtterances = () => {
     script.src = "https://utteranc.es/client.js";
     script.async = "async";
 
-    script.setAttribute("repo", "wangxuuu/AdapLS_MINE");
+    script.setAttribute("repo", "wangxuuu/Smoothed-InfoNCE");
     script.setAttribute("issue-term", "pathname");
     script.setAttribute("theme", "github-light");
     script.setAttribute("label", "💬 comment");
@@ -143,6 +143,11 @@ commentsRunWhenDOMLoaded(addUtterances);
  <li class="toctree-l1">
   <a class="reference internal" href="smoothed_infoNCE.html#initialize-the-model">
    Initialize the model.
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Analysis.html">
+   Load and compare the experiment results
   </a>
  </li>
 </ul>
@@ -241,11 +246,11 @@ commentsRunWhenDOMLoaded(addUtterances);
 <div class="section" id="background">
 <h2>Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h2>
 <p>We revisit the <span class="math notranslate nohighlight">\(\log N\)</span> bound of InfoNCE, which sets an upper limit on the estimator thereby often causing the estimator to return an under-estimate of the mutual information. We show that the existing solution of excluding data samples from the reference set causes an equally debilitating problem, namely, it causes the estimator to overshoot, often with no sign of convergence, thereby leading to an over-estimate of the mutual information.</p>
-<p>We illustrate the undershooting problem and overshooting problem of InfoNCE in infonce.ipynb.</p>
+<p>We illustrate the undershooting problem and overshooting problem of InfoNCE in <a class="reference external" href="https://github.com/wangxuuu/Smoothed-InfoNCE/blob/main/infonce.ipynb">infonce.ipynb</a>.</p>
 </div>
 <div class="section" id="proposed-model-smoothed-infonce">
 <h2>Proposed Model: Smoothed InfoNCE<a class="headerlink" href="#proposed-model-smoothed-infonce" title="Permalink to this headline">¶</a></h2>
-<p>We conduct the experiments on estimating mutual information for high-dimensional Gaussian data. The results show that our model can successfully break the log N curse of InfoNCE without overshooting to infinity.</p>
+<p>We conduct the experiments on estimating mutual information for high-dimensional Gaussian data. The results show that our model can successfully break the log N curse of InfoNCE without overshooting to infinity. The code can be accessed at <a class="reference external" href="https://github.com/wangxuuu/Smoothed-InfoNCE/blob/main/smoothed_infonce.ipynb">smoothed_infonce.ipynb</a></p>
 <div class="toctree-wrapper compound">
 </div>
 </div>
@@ -288,7 +293,7 @@ commentsRunWhenDOMLoaded(addUtterances);
         
           By Xu Wang, Ali Al-Bashabsheh, Chao Zhao, Chung Chan<br/>
         
-            &copy; Copyright 2021.<br/>
+            &copy; Copyright 2022.<br/>
       </p>
     </div>
   </footer>
