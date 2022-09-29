@@ -9,3 +9,16 @@ We illustrate the undershooting problem and overshooting problem of InfoNCE in [
 ## Proposed Model: Smoothed InfoNCE
 
 We conduct the experiments on estimating mutual information for high-dimensional Gaussian data. The results show that our model can successfully break the log N curse of InfoNCE without overshooting to infinity. The code can be accessed at [smoothed_infonce.ipynb](https://github.com/wangxuuu/Smoothed-InfoNCE/blob/main/smoothed_infonce.ipynb)
+
+## Citation
+
+If you find this code and the paper helpful, please considering cite our work:
+
+> @inproceedings{wang2022smoothed,
+  title={Smoothed InfoNCE: Breaking the log N Curse without Overshooting}, 
+  author={Wang, Xu and Al-Bashabsheh, Ali and Zhao, Chao and Chan, Chung},
+  booktitle={2022 IEEE International Symposium on Information Theory (ISIT)},
+  pages={724--729},
+  year={2022},
+  organization={IEEE}
+}
